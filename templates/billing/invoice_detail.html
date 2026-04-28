@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="card p-4">
+
+<h2>Invoice #{{ invoice.id }}</h2>
+
+<p><strong>Customer:</strong> {{ invoice.customer_name }}</p>
+<p><strong>Date:</strong> {{ invoice.created_at }}</p>
+
+<table class="table">
+    <tr>
+        <th>Product</th>
+        <th>Price</th>
+        <th>Qty</th>
+        <th>Total</th>
+    </tr>
+
+    {% for item in items %}
+    <tr>
+        <td>{{ item.product.name }}</td>
+        <td>{{ item.price }}</td>
+        <td>{{ item.quantity }}</td>
+        <td>{{ item.get_total }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<h4>Total: ₹{{ invoice.get_total }}</h4>
+
+<a href="/billing/invoice/{{ invoice.id }}/pdf/" class="btn btn-success">Download PDF</a>
+<button onclick="window.print()" class="btn btn-secondary">Print</button>
+
+</div>
+
+{% endblock %}

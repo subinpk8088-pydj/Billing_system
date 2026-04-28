@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="card shadow p-4">
+
+    <h2 class="text-center mb-4">Create Invoice</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <label>Customer Name</label>
+            {{ form.customer_name }}
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <label>Tax</label>
+                {{ form.tax }}
+            </div>
+
+            <div class="col-md-6">
+                <label>Discount</label>
+                {{ form.discount }}
+            </div>
+        </div>
+
+        <h4 class="mt-4">Items</h4>
+
+        <div id="items">
+            <div class="row mb-2">
+                <div class="col-md-6">
+                    <select name="product" class="form-select product" onchange="calculateTotal()">
+                        {% for product in products %}
+                        <option value="{{ product.id }}" data-price="{{ product.price }}">
+                            {{ product.name }} (₹{{ product.price }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <input type="number" name="quantity" class="form-control quantity" oninput="calculateTotal()">
+                </div>
+            </div>
+        </div>
+
+        <button type="button" class="btn btn-secondary mt-2" onclick="addItem()">+ Add Item</button>
+
+        <hr>
+
+        <h5>Subtotal: ₹<span id="subtotal">0.00</span></h5>
+        <h5>Total: ₹<span id="total">0.00</span></h5>
+
+        <button class="btn btn-primary mt-3">Create Invoice</button>
+    </form>
+
+</div>
+
+<script>
+function addItem() {
+    let html = `
+        <div class="row mb-2">
+            <div class="col-md-6">
+                <select name="product" class="form-select product" onchange="calculateTotal()">
+                    {% for product in products %}
+                    <option value="{{ product.id }}" data-price="{{ product.price }}">
+                        {{ product.name }} (₹{{ product.price }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <input type="number" name="quantity" class="form-control quantity" oninput="calculateTotal()">
+            </div>
+        </div>
+    `;
+    document.getElementById('items').insertAdjacentHTML('beforeend', html);
+}
+
+function calculateTotal() {
+    let subtotal = 0;
+
+    document.querySelectorAll('#items .row').forEach(row => {
+        let p = row.querySelector('.product');
+        let q = row.querySelector('.quantity');
+
+        if (p && q && q.value) {
+            let price = parseFloat(p.options[p.selectedIndex].dataset.price);
+            subtotal += price * q.value;
+        }
+    });
+
+    let tax = parseFloat(document.getElementById("id_tax").value) || 0;
+    let discount = parseFloat(document.getElementById("id_discount").value) || 0;
+
+    let total = subtotal + tax - discount;
+
+    document.getElementById("subtotal").innerText = subtotal.toFixed(2);
+    document.getElementById("total").innerText = total.toFixed(2);
+}
+
+document.addEventListener('input', calculateTotal);
+</script>
+
+{% endblock %}

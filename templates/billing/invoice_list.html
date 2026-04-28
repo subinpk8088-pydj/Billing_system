@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>Invoices</h2>
+
+<table class="table table-bordered">
+    <tr>
+        <th>ID</th>
+        <th>Customer</th>
+        <th>Date</th>
+        <th>Total</th>
+        <th>Action</th>
+    </tr>
+
+    {% for invoice in invoices %}
+    <tr>
+        <td>{{ invoice.id }}</td>
+        <td>{{ invoice.customer_name }}</td>
+        <td>{{ invoice.created_at }}</td>
+        <td>{{ invoice.get_total }}</td>
+        <td>
+            <a href="/billing/invoice/{{ invoice.id }}/" class="btn btn-primary btn-sm">View</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}
