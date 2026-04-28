@@ -1,0 +1,21 @@
+<h2>Sales Report</h2>
+
+<p>From: {{ start }} To: {{ end }}</p>
+
+<table border="1" cellpadding="5">
+    <tr>
+        <th>ID</th>
+        <th>Customer</th>
+        <th>Total</th>
+    </tr>
+
+    {% for inv in invoices %}
+    <tr>
+        <td>{{ inv.id }}</td>
+Customer: {{ invoice.customer.name }}
+        <td>&#8377; {{ inv.get_total }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<h3>Total Revenue: &#8377; {{ total }}</h3>

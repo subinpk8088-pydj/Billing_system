@@ -16,7 +16,7 @@
     {% for invoice in invoices %}
     <tr>
         <td>{{ invoice.id }}</td>
-        <td>{{ invoice.customer_name }}</td>
+<td>{{ invoice.customer.name }}</td>
         <td>{{ invoice.created_at }}</td>
         <td>{{ invoice.get_total }}</td>
         <td>

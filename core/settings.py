@@ -1,10 +1,11 @@
 from pathlib import Path
+import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # SECURITY
-SECRET_KEY = 'django-insecure-change-this-in-production'
+SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key')
 DEBUG = True
 ALLOWED_HOSTS = []
 
@@ -37,15 +38,14 @@ MIDDLEWARE = [
 ]
 
 
-# URL
 ROOT_URLCONF = 'core.urls'
 
 
-# TEMPLATES (IMPORTANT FIX HERE)
+# TEMPLATES
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],  # ✅ allows global templates
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -81,16 +81,24 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # INTERNATIONAL
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'Asia/Kolkata'  # ✅ better for you
+TIME_ZONE = 'Asia/Kolkata'
 USE_I18N = True
 USE_TZ = True
 
 
-# STATIC FILES (IMPORTANT FOR UI)
+# STATIC FILES
 STATIC_URL = '/static/'
+
 STATICFILES_DIRS = [
-    BASE_DIR / "static",   # ✅ for custom CSS/JS later
+    BASE_DIR / "static",
 ]
+
+STATIC_ROOT = BASE_DIR / "staticfiles"  # ✅ required for deployment
+
+
+# MEDIA FILES
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 
 # DEFAULT PRIMARY KEY
@@ -101,12 +109,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'accounts.User'
 
 
-# AUTH SETTINGS (CRITICAL FOR LOGIN)
+# AUTH SETTINGS
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/billing/invoices/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 
 
-# MEDIA FILES (for future features like profile image / invoice logo)
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+# CSRF (future deployment fix)
+CSRF_TRUSTED_ORIGINS = []

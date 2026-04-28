@@ -7,32 +7,78 @@
 
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#">BillingApp</a>
 
-        <div class="collapse navbar-collapse">
-            <ul class="navbar-nav ms-auto">
+        <!-- 🔥 Brand -->
+        <a class="navbar-brand fw-bold" href="{% url 'dashboard' %}">
+            💼 BillingPro
+        </a>
+
+        <!-- Mobile toggle -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+
+            <!-- 🔥 Left menu -->
+            <ul class="navbar-nav me-auto">
 
                 <li class="nav-item">
-                    <a class="nav-link" href="/billing/create/">Create</a>
+                    <a class="nav-link {% if request.path == '/billing/' %}active{% endif %}" href="{% url 'dashboard' %}">
+                        Dashboard
+                    </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="/billing/invoices/">Invoices</a>
+                    <a class="nav-link {% if '/billing/invoices' in request.path %}active{% endif %}" href="{% url 'invoice_list' %}">
+                        Invoices
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link {% if '/billing/create' in request.path %}active{% endif %}" href="{% url 'create_invoice' %}">
+                        Create Invoice
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link {% if '/billing/products' in request.path %}active{% endif %}" href="{% url 'product_list' %}">
+                        Products
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link {% if '/billing/products/add' in request.path %}active{% endif %}" href="{% url 'add_product' %}">
+                        Add Product
+                    </a>
                 </li>
                 <li class="nav-item">
-    <a class="nav-link" href="/billing/products/">Products</a>
+    <a class="nav-link" href="/billing/customers/">Customers</a>
 </li>
+            </ul>
 
-<li class="nav-item">
-    <a class="nav-link" href="/billing/products/add/">Add Product</a>
-</li>
+            <!-- 🔥 Right side -->
+            <ul class="navbar-nav">
+
                 <li class="nav-item">
-                    <a class="nav-link" href="/accounts/logout/">Logout</a>
+                    <span class="nav-link text-light">
+                        👤 {{ request.user.username }}
+                    </span>
+                </li>
+
+                <li class="nav-item">
+                    <form action="{% url 'logout' %}" method="POST" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-sm ms-2">
+                            Logout
+                        </button>
+                    </form>
                 </li>
 
             </ul>
+
         </div>
     </div>
 </nav>
@@ -51,6 +97,8 @@
     {% endblock %}
 
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

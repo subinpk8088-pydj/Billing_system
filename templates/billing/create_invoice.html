@@ -2,34 +2,37 @@
 
 {% block content %}
 
-<div class="card shadow p-4">
+<div class="card shadow-lg border-0 p-4">
 
-    <h2 class="text-center mb-4">Create Invoice</h2>
+    <h2 class="text-center mb-4 fw-bold">🧾 Create Invoice</h2>
 
     <form method="POST">
         {% csrf_token %}
 
+        <!-- CUSTOMER -->
         <div class="mb-3">
-            <label>Customer Name</label>
-            {{ form.customer_name }}
+           <label>Customer</label>
+{{ form.customer_input }}
         </div>
 
+        <!-- TAX + DISCOUNT -->
         <div class="row">
             <div class="col-md-6">
-                <label>Tax</label>
+                <label class="form-label">Tax</label>
                 {{ form.tax }}
             </div>
 
             <div class="col-md-6">
-                <label>Discount</label>
+                <label class="form-label">Discount</label>
                 {{ form.discount }}
             </div>
         </div>
 
-        <h4 class="mt-4">Items</h4>
+        <!-- ITEMS -->
+        <h5 class="mt-4">🛒 Items</h5>
 
         <div id="items">
-            <div class="row mb-2">
+            <div class="row mb-2 align-items-center">
                 <div class="col-md-6">
                     <select name="product" class="form-select product" onchange="calculateTotal()">
                         {% for product in products %}
@@ -41,19 +44,27 @@
                 </div>
 
                 <div class="col-md-4">
-                    <input type="number" name="quantity" class="form-control quantity" oninput="calculateTotal()">
+                    <input type="number" name="quantity" min="1"
+                        class="form-control quantity"
+                        placeholder="Qty"
+                        oninput="calculateTotal()">
                 </div>
             </div>
         </div>
 
-        <button type="button" class="btn btn-secondary mt-2" onclick="addItem()">+ Add Item</button>
+        <button type="button" class="btn btn-outline-secondary mt-2" onclick="addItem()">
+            + Add Item
+        </button>
 
         <hr>
 
-        <h5>Subtotal: ₹<span id="subtotal">0.00</span></h5>
-        <h5>Total: ₹<span id="total">0.00</span></h5>
+        <!-- TOTALS -->
+        <div class="bg-light p-3 rounded">
+            <h6>Subtotal: ₹<span id="subtotal">0.00</span></h6>
+            <h5 class="fw-bold">Total: ₹<span id="total">0.00</span></h5>
+        </div>
 
-        <button class="btn btn-primary mt-3">Create Invoice</button>
+        <button class="btn btn-primary w-100 mt-3">Create Invoice</button>
     </form>
 
 </div>
@@ -61,7 +72,7 @@
 <script>
 function addItem() {
     let html = `
-        <div class="row mb-2">
+        <div class="row mb-2 align-items-center">
             <div class="col-md-6">
                 <select name="product" class="form-select product" onchange="calculateTotal()">
                     {% for product in products %}
@@ -73,7 +84,10 @@ function addItem() {
             </div>
 
             <div class="col-md-4">
-                <input type="number" name="quantity" class="form-control quantity" oninput="calculateTotal()">
+                <input type="number" name="quantity" min="1"
+                    class="form-control quantity"
+                    placeholder="Qty"
+                    oninput="calculateTotal()">
             </div>
         </div>
     `;
@@ -93,8 +107,8 @@ function calculateTotal() {
         }
     });
 
-    let tax = parseFloat(document.getElementById("id_tax").value) || 0;
-    let discount = parseFloat(document.getElementById("id_discount").value) || 0;
+    let tax = parseFloat(document.getElementById("id_tax")?.value) || 0;
+    let discount = parseFloat(document.getElementById("id_discount")?.value) || 0;
 
     let total = subtotal + tax - discount;
 

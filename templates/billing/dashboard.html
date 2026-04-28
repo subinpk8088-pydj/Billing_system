@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2 class="mb-4 fw-bold">📊 Business Dashboard</h2>
+
+<!-- 🔥 FILTER (NEW - IMPORTANT) -->
+<form method="GET" class="row mb-4 g-2">
+
+    <div class="col-md-4">
+        <input type="date" name="start" value="{{ request.GET.start }}" class="form-control">
+    </div>
+
+    <div class="col-md-4">
+        <input type="date" name="end" value="{{ request.GET.end }}" class="form-control">
+    </div>
+
+    <div class="col-md-4 d-flex gap-2">
+    <button class="btn btn-dark w-100">Apply Filter</button>
+
+    <a href="/billing/dashboard/pdf/?start={{ request.GET.start }}&end={{ request.GET.end }}"
+       class="btn btn-success w-100">
+       Export PDF
+    </a>
+</div>
+
+</form>
+
+
+<!-- 🔥 CARDS -->
+<div class="row g-3 mb-4">
+
+    <div class="col-md-3">
+        <div class="card shadow border-0 p-3 bg-success text-white">
+            <h6>Total Revenue</h6>
+            <h3>₹{{ total_revenue }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow border-0 p-3 bg-primary text-white">
+            <h6>Invoices</h6>
+            <h3>{{ total_invoices }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow border-0 p-3 bg-warning text-dark">
+            <h6>Products</h6>
+            <h3>{{ total_products }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow border-0 p-3 bg-danger text-white">
+            <h6>Low Stock</h6>
+<h3>{{ low_stock_products|length }}</h3>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- 🔥 CHART ROW 1 -->
+<div class="row mb-4 g-3">
+
+    <!-- Monthly Revenue -->
+    <div class="col-md-6">
+        <div class="card shadow p-3">
+            <h5>📈 Monthly Revenue</h5>
+            <canvas id="revenueChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Top Products -->
+    <div class="col-md-6">
+        <div class="card shadow p-3">
+            <h5>🔥 Top Selling Products</h5>
+            <canvas id="productChart"></canvas>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- 🔥 CHART ROW 2 -->
+<div class="row mb-4 g-3">
+
+    <!-- Payment Methods -->
+    <div class="col-md-6">
+        <div class="card shadow p-3">
+            <h5>💳 Payment Methods</h5>
+            <canvas id="paymentChart"></canvas>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- 🔥 TABLES -->
+<div class="row g-3">
+
+    <div class="col-md-6">
+        <div class="card shadow p-3">
+            <h5>⚠️ Low Stock</h5>
+            <table class="table table-sm table-hover">
+                {% for p in low_stock_products %}
+                <tr>
+                    <td>{{ p.name }}</td>
+                    <td class="text-danger fw-bold">{{ p.stock }}</td>
+                </tr>
+                {% empty %}
+                <tr><td>No issues</td></tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card shadow p-3">
+            <h5>🕒 Recent Invoices</h5>
+            <table class="table table-sm table-striped">
+                {% for inv in recent_invoices %}
+                <tr>
+                    <td>#{{ inv.id }}</td>
+                    <td>{{ inv.customer.name }}</td>
+                    <td class="fw-bold">₹{{ inv.get_total }}</td>
+                </tr>
+                {% empty %}
+                <tr><td>No invoices</td></tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+new Chart(document.getElementById('revenueChart'), {
+    type: 'bar',
+    data: {
+        labels: {{ months|safe }},
+        datasets: [{
+            label: 'Revenue',
+            data: {{ totals|safe }},
+            borderWidth: 1
+        }]
+    }
+});
+
+new Chart(document.getElementById('productChart'), {
+    type: 'bar',
+    data: {
+        labels: {{ top_product_names|safe }},
+        datasets: [{
+            label: 'Sales',
+            data: {{ top_product_sales|safe }},
+            borderWidth: 1
+        }]
+    }
+});
+
+new Chart(document.getElementById('paymentChart'), {
+    type: 'pie',
+    data: {
+        labels: {{ payment_labels|safe }},
+        datasets: [{
+            data: {{ payment_totals|safe }}
+        }]
+    }
+});
+</script>
+
+{% endblock %}
