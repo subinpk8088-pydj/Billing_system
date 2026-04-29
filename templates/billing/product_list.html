@@ -2,29 +2,55 @@
 
 {% block content %}
 
-<h2 class="mb-3">Products</h2>
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+    <div>
+        <p class="page-sup">Inventory</p>
+        <h1 class="page-title">Products</h1>
+    </div>
+    <a href="{% url 'add_product' %}" class="bp-btn bp-btn-primary">
+        <i class="bi bi-plus-square-fill"></i> Add Product
+    </a>
+</div>
 
-<table class="table table-bordered">
-    <tr>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Price (₹)</th>
-        <th>Stock</th>
-    </tr>
-
-    {% for product in products %}
-    <tr>
-        <td>{{ product.id }}</td>
-        <td>{{ product.name }}</td>
-        <td>{{ product.price }}</td>
-        <td>{{ product.stock }}</td>
-    </tr>
-    {% empty %}
-    <tr>
-        <td colspan="4">No products found</td>
-    </tr>
-    {% endfor %}
-
-</table>
+<div class="bp-card" style="padding:0;overflow:hidden;">
+    <div style="overflow-x:auto;">
+        <table class="bp-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th style="text-align:right;">Price (₹)</th>
+                    <th style="text-align:right;">Stock</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr>
+                    <td><span class="bp-badge bp-badge-purple">{{ product.id }}</span></td>
+                    <td style="font-weight:500;color:var(--text);">{{ product.name }}</td>
+                    <td style="text-align:right;color:var(--green);font-weight:600;">₹{{ product.price }}</td>
+                    <td style="text-align:right;">
+                        {% if product.stock < 5 %}
+                            <span class="bp-badge bp-badge-red">{{ product.stock }} ⚠</span>
+                        {% elif product.stock < 20 %}
+                            <span class="bp-badge bp-badge-amber">{{ product.stock }}</span>
+                        {% else %}
+                            <span class="bp-badge bp-badge-green">{{ product.stock }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" style="text-align:center;padding:3.5rem;color:var(--text-muted);">
+                        <i class="bi bi-box-seam" style="font-size:2.5rem;display:block;margin-bottom:.85rem;color:var(--text-dim);"></i>
+                        No products yet —
+                        <a href="{% url 'add_product' %}" style="color:var(--accent-2);text-decoration:none;">add one</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 
 {% endblock %}

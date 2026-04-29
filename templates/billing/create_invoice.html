@@ -2,121 +2,159 @@
 
 {% block content %}
 
-<div class="card shadow-lg border-0 p-4">
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <p class="page-sup">
+            <a href="{% url 'invoice_list' %}">Invoices</a>
+            <i class="bi bi-chevron-right" style="font-size:.6rem;margin:0 .3rem;"></i> Create
+        </p>
+        <h1 class="page-title">New Invoice</h1>
+    </div>
+</div>
 
-    <h2 class="text-center mb-4 fw-bold">🧾 Create Invoice</h2>
+<div class="row g-4">
+    <!-- Form -->
+    <div class="col-12 col-lg-8">
+        <div class="bp-card">
+            <form method="POST">
+                {% csrf_token %}
 
-    <form method="POST">
-        {% csrf_token %}
-
-        <!-- CUSTOMER -->
-        <div class="mb-3">
-           <label>Customer</label>
-{{ form.customer_input }}
-        </div>
-
-        <!-- TAX + DISCOUNT -->
-        <div class="row">
-            <div class="col-md-6">
-                <label class="form-label">Tax</label>
-                {{ form.tax }}
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label">Discount</label>
-                {{ form.discount }}
-            </div>
-        </div>
-
-        <!-- ITEMS -->
-        <h5 class="mt-4">🛒 Items</h5>
-
-        <div id="items">
-            <div class="row mb-2 align-items-center">
-                <div class="col-md-6">
-                    <select name="product" class="form-select product" onchange="calculateTotal()">
-                        {% for product in products %}
-                        <option value="{{ product.id }}" data-price="{{ product.price }}">
-                            {{ product.name }} (₹{{ product.price }})
-                        </option>
-                        {% endfor %}
-                    </select>
+                <div class="mb-4">
+                    <label class="bp-label"><i class="bi bi-person-fill me-1"></i>Customer Name</label>
+                    {{ form.customer_input }}
                 </div>
 
-                <div class="col-md-4">
-                    <input type="number" name="quantity" min="1"
-                        class="form-control quantity"
-                        placeholder="Qty"
-                        oninput="calculateTotal()">
+                <div class="row g-3 mb-4">
+                    <div class="col-6">
+                        <label class="bp-label"><i class="bi bi-percent me-1"></i>Tax (₹)</label>
+                        {{ form.tax }}
+                    </div>
+                    <div class="col-6">
+                        <label class="bp-label"><i class="bi bi-tag-fill me-1"></i>Discount (₹)</label>
+                        {{ form.discount }}
+                    </div>
                 </div>
+
+                <hr class="bp-hr">
+
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <span class="section-title"><i class="bi bi-cart3 me-1" style="color:var(--accent-2);"></i>Items</span>
+                    <button type="button" class="bp-btn bp-btn-ghost" onclick="addItem()" style="font-size:.78rem;padding:.35rem .9rem;">
+                        <i class="bi bi-plus-circle"></i> Add Item
+                    </button>
+                </div>
+
+                <div id="items">
+                    <div class="item-row row g-2 mb-2 align-items-end">
+                        <div class="col-7">
+                            <label class="bp-label">Product</label>
+                            <select name="product" class="form-select product" onchange="calculateTotal()">
+                                {% for product in products %}
+                                <option value="{{ product.id }}" data-price="{{ product.price }}">
+                                    {{ product.name }} — ₹{{ product.price }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-4">
+                            <label class="bp-label">Quantity</label>
+                            <input type="number" name="quantity" min="1" value="1"
+                                class="form-control quantity" oninput="calculateTotal()">
+                        </div>
+                        <div class="col-1 d-flex align-items-center pb-1">
+                            <button type="button" onclick="removeItem(this)"
+                                style="background:none;border:none;color:var(--red);font-size:1rem;cursor:pointer;padding:.4rem;opacity:.7;"
+                                onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=.7">
+                                <i class="bi bi-trash3-fill"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="bp-hr">
+                <button class="bp-btn bp-btn-primary w-100" style="justify-content:center;padding:.75rem;font-size:.92rem;">
+                    <i class="bi bi-receipt-cutoff"></i> Create Invoice
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Summary Panel -->
+    <div class="col-12 col-lg-4">
+        <div class="bp-card" style="position:sticky;top:130px;background:linear-gradient(160deg,rgba(139,92,246,.08),var(--bg-card));border-color:rgba(139,92,246,.25);">
+            <div class="section-title mb-3" style="color:var(--accent-2);">
+                <i class="bi bi-calculator me-2"></i>Order Summary
+            </div>
+
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:.65rem 0;border-bottom:1px solid var(--border-soft);">
+                <span style="color:var(--text-muted);font-size:.86rem;">Subtotal</span>
+                <span style="font-weight:600;color:var(--text);">₹<span id="subtotal">0.00</span></span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:.65rem 0;border-bottom:1px solid var(--border-soft);">
+                <span style="color:var(--text-muted);font-size:.86rem;">Tax</span>
+                <span style="color:var(--text);">+₹<span id="live_tax">0.00</span></span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:.65rem 0;border-bottom:1px solid var(--border-soft);">
+                <span style="color:var(--text-muted);font-size:.86rem;">Discount</span>
+                <span style="color:var(--red);">−₹<span id="live_disc">0.00</span></span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:1rem 0 .25rem;">
+                <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;">Total</span>
+                <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.7rem;color:var(--accent-2);">
+                    ₹<span id="total">0.00</span>
+                </span>
             </div>
         </div>
-
-        <button type="button" class="btn btn-outline-secondary mt-2" onclick="addItem()">
-            + Add Item
-        </button>
-
-        <hr>
-
-        <!-- TOTALS -->
-        <div class="bg-light p-3 rounded">
-            <h6>Subtotal: ₹<span id="subtotal">0.00</span></h6>
-            <h5 class="fw-bold">Total: ₹<span id="total">0.00</span></h5>
-        </div>
-
-        <button class="btn btn-primary w-100 mt-3">Create Invoice</button>
-    </form>
-
+    </div>
 </div>
 
 <script>
-function addItem() {
-    let html = `
-        <div class="row mb-2 align-items-center">
-            <div class="col-md-6">
-                <select name="product" class="form-select product" onchange="calculateTotal()">
-                    {% for product in products %}
-                    <option value="{{ product.id }}" data-price="{{ product.price }}">
-                        {{ product.name }} (₹{{ product.price }})
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
+const productOptions = `{% for product in products %}<option value="{{ product.id }}" data-price="{{ product.price }}">{{ product.name }} — ₹{{ product.price }}</option>{% endfor %}`;
 
-            <div class="col-md-4">
-                <input type="number" name="quantity" min="1"
-                    class="form-control quantity"
-                    placeholder="Qty"
-                    oninput="calculateTotal()">
-            </div>
+function addItem() {
+    const div = document.createElement('div');
+    div.className = 'item-row row g-2 mb-2 align-items-end';
+    div.innerHTML = `
+        <div class="col-7">
+            <label class="bp-label">Product</label>
+            <select name="product" class="form-select product" onchange="calculateTotal()">${productOptions}</select>
         </div>
-    `;
-    document.getElementById('items').insertAdjacentHTML('beforeend', html);
+        <div class="col-4">
+            <label class="bp-label">Quantity</label>
+            <input type="number" name="quantity" min="1" value="1" class="form-control quantity" oninput="calculateTotal()">
+        </div>
+        <div class="col-1 d-flex align-items-center pb-1">
+            <button type="button" onclick="removeItem(this)"
+                style="background:none;border:none;color:var(--red);font-size:1rem;cursor:pointer;padding:.4rem;opacity:.7;"
+                onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=.7">
+                <i class="bi bi-trash3-fill"></i>
+            </button>
+        </div>`;
+    document.getElementById('items').appendChild(div);
+}
+
+function removeItem(btn) {
+    const rows = document.querySelectorAll('.item-row');
+    if (rows.length > 1) { btn.closest('.item-row').remove(); calculateTotal(); }
 }
 
 function calculateTotal() {
-    let subtotal = 0;
-
-    document.querySelectorAll('#items .row').forEach(row => {
-        let p = row.querySelector('.product');
-        let q = row.querySelector('.quantity');
-
-        if (p && q && q.value) {
-            let price = parseFloat(p.options[p.selectedIndex].dataset.price);
-            subtotal += price * q.value;
-        }
+    let sub = 0;
+    document.querySelectorAll('.item-row').forEach(row => {
+        const p = row.querySelector('.product');
+        const q = row.querySelector('.quantity');
+        if (p && q && q.value) sub += parseFloat(p.options[p.selectedIndex].dataset.price) * parseFloat(q.value);
     });
-
-    let tax = parseFloat(document.getElementById("id_tax")?.value) || 0;
-    let discount = parseFloat(document.getElementById("id_discount")?.value) || 0;
-
-    let total = subtotal + tax - discount;
-
-    document.getElementById("subtotal").innerText = subtotal.toFixed(2);
-    document.getElementById("total").innerText = total.toFixed(2);
+    const tax  = parseFloat(document.getElementById('id_tax')?.value)     || 0;
+    const disc = parseFloat(document.getElementById('id_discount')?.value) || 0;
+    document.getElementById('subtotal').textContent  = sub.toFixed(2);
+    document.getElementById('live_tax').textContent  = tax.toFixed(2);
+    document.getElementById('live_disc').textContent = disc.toFixed(2);
+    document.getElementById('total').textContent     = (sub + tax - disc).toFixed(2);
 }
 
 document.addEventListener('input', calculateTotal);
+calculateTotal();
 </script>
 
 {% endblock %}

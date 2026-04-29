@@ -2,38 +2,71 @@
 
 {% block content %}
 
-<div class="d-flex justify-content-between mb-3">
-    <h2>Customers</h2>
-    <a href="/billing/customers/add/" class="btn btn-primary">+ Add</a>
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+    <div>
+        <p class="page-sup">CRM</p>
+        <h1 class="page-title">Customers</h1>
+    </div>
+    <a href="/billing/customers/add/" class="bp-btn bp-btn-primary">
+        <i class="bi bi-person-plus-fill"></i> Add Customer
+    </a>
 </div>
 
-<form method="GET" class="mb-3">
-    <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Search customer...">
+<!-- Search -->
+<form method="GET" class="mb-4">
+    <div class="search-wrap" style="max-width:400px;">
+        <i class="bi bi-search si"></i>
+        <input type="text" name="q" value="{{ query }}" class="form-control"
+               placeholder="Search by name…">
+    </div>
 </form>
 
-<table class="table table-bordered table-hover">
-    <tr>
-        <th>Name</th>
-        <th>Phone</th>
-        <th>Email</th>
-        <th>Action</th>
-    </tr>
-
-    {% for c in customers %}
-    <tr>
-        <td>{{ c.name }}</td>
-        <td>{{ c.phone }}</td>
-        <td>{{ c.email }}</td>
-        <td>
-            <a href="/billing/customers/edit/{{ c.id }}/" class="btn btn-sm btn-warning">Edit</a>
-            <a href="/billing/customers/delete/{{ c.id }}/" class="btn btn-sm btn-danger">Delete</a>
-        </td>
-    </tr>
-    {% empty %}
-    <tr>
-        <td colspan="4">No customers</td>
-    </tr>
-    {% endfor %}
-</table>
+<div class="bp-card" style="padding:0;overflow:hidden;">
+    <div style="overflow-x:auto;">
+        <table class="bp-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th style="text-align:right;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in customers %}
+                <tr>
+                    <td>
+                        <div style="display:flex;align-items:center;gap:.65rem;">
+                            <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#6d28d9);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:#fff;flex-shrink:0;box-shadow:0 0 10px var(--accent-glow);">
+                                {{ c.name|first|upper }}
+                            </div>
+                            <span style="font-weight:500;color:var(--text);">{{ c.name }}</span>
+                        </div>
+                    </td>
+                    <td style="color:var(--text-muted);">{{ c.phone }}</td>
+                    <td style="color:var(--text-muted);">{{ c.email }}</td>
+                    <td style="text-align:right;">
+                        <a href="/billing/customers/edit/{{ c.id }}/" class="bp-btn bp-btn-ghost" style="font-size:.78rem;padding:.3rem .8rem;margin-right:.35rem;">
+                            <i class="bi bi-pencil-fill"></i> Edit
+                        </a>
+                        <a href="/billing/customers/delete/{{ c.id }}/" class="bp-btn bp-btn-danger" style="font-size:.78rem;padding:.3rem .8rem;"
+                           onclick="return confirm('Delete {{ c.name }}?')">
+                            <i class="bi bi-trash3-fill"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" style="text-align:center;padding:3.5rem;color:var(--text-muted);">
+                        <i class="bi bi-people" style="font-size:2.5rem;display:block;margin-bottom:.85rem;color:var(--text-dim);"></i>
+                        No customers yet —
+                        <a href="/billing/customers/add/" style="color:var(--accent-2);text-decoration:none;">add one</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 
 {% endblock %}

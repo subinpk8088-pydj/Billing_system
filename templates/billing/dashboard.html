@@ -2,152 +2,233 @@
 
 {% block content %}
 
-<h2 class="mb-4 fw-bold">📊 Business Dashboard</h2>
-
-<!-- 🔥 FILTER (NEW - IMPORTANT) -->
-<form method="GET" class="row mb-4 g-2">
-
-    <div class="col-md-4">
-        <input type="date" name="start" value="{{ request.GET.start }}" class="form-control">
+<!-- Header Row -->
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+    <div>
+        <p class="page-sup">Overview</p>
+        <h1 class="page-title">Business Dashboard</h1>
     </div>
-
-    <div class="col-md-4">
-        <input type="date" name="end" value="{{ request.GET.end }}" class="form-control">
-    </div>
-
-    <div class="col-md-4 d-flex gap-2">
-    <button class="btn btn-dark w-100">Apply Filter</button>
-
-    <a href="/billing/dashboard/pdf/?start={{ request.GET.start }}&end={{ request.GET.end }}"
-       class="btn btn-success w-100">
-       Export PDF
-    </a>
+    <form method="GET" class="d-flex flex-wrap gap-2 align-items-center">
+        <input type="date" name="start" value="{{ request.GET.start }}" class="form-control" style="width:148px;">
+        <input type="date" name="end"   value="{{ request.GET.end }}"   class="form-control" style="width:148px;">
+        <button class="bp-btn bp-btn-primary"><i class="bi bi-funnel-fill"></i> Filter</button>
+        <a href="/billing/dashboard/pdf/?start={{ request.GET.start }}&end={{ request.GET.end }}"
+           class="bp-btn bp-btn-success"><i class="bi bi-file-earmark-pdf-fill"></i> Export PDF</a>
+    </form>
 </div>
 
-</form>
-
-
-<!-- 🔥 CARDS -->
+<!-- Quick Nav Cards -->
 <div class="row g-3 mb-4">
-
-    <div class="col-md-3">
-        <div class="card shadow border-0 p-3 bg-success text-white">
-            <h6>Total Revenue</h6>
-            <h3>₹{{ total_revenue }}</h3>
-        </div>
+    <div class="col-6 col-sm-4 col-md-2">
+        <a href="{% url 'create_invoice' %}" class="nav-card">
+            <div class="nc-icon" style="background:rgba(139,92,246,.18);color:var(--accent-2);">
+                <i class="bi bi-plus-circle-fill"></i>
+            </div>
+            <span class="nc-label">New Invoice</span>
+        </a>
     </div>
-
-    <div class="col-md-3">
-        <div class="card shadow border-0 p-3 bg-primary text-white">
-            <h6>Invoices</h6>
-            <h3>{{ total_invoices }}</h3>
-        </div>
+    <div class="col-6 col-sm-4 col-md-2">
+        <a href="{% url 'invoice_list' %}" class="nav-card">
+            <div class="nc-icon" style="background:rgba(167,139,250,.12);color:var(--accent-3);">
+                <i class="bi bi-receipt"></i>
+            </div>
+            <span class="nc-label">All Invoices</span>
+        </a>
     </div>
-
-    <div class="col-md-3">
-        <div class="card shadow border-0 p-3 bg-warning text-dark">
-            <h6>Products</h6>
-            <h3>{{ total_products }}</h3>
-        </div>
+    <div class="col-6 col-sm-4 col-md-2">
+        <a href="{% url 'product_list' %}" class="nav-card">
+            <div class="nc-icon" style="background:rgba(245,158,11,.12);color:#fbbf24;">
+                <i class="bi bi-box-seam-fill"></i>
+            </div>
+            <span class="nc-label">Products</span>
+        </a>
     </div>
-
-    <div class="col-md-3">
-        <div class="card shadow border-0 p-3 bg-danger text-white">
-            <h6>Low Stock</h6>
-<h3>{{ low_stock_products|length }}</h3>
-        </div>
+    <div class="col-6 col-sm-4 col-md-2">
+        <a href="{% url 'add_product' %}" class="nav-card">
+            <div class="nc-icon" style="background:rgba(16,185,129,.12);color:#34d399;">
+                <i class="bi bi-plus-square-fill"></i>
+            </div>
+            <span class="nc-label">Add Product</span>
+        </a>
     </div>
-
+    <div class="col-6 col-sm-4 col-md-2">
+        <a href="/billing/customers/" class="nav-card">
+            <div class="nc-icon" style="background:rgba(236,72,153,.12);color:#f9a8d4;">
+                <i class="bi bi-people-fill"></i>
+            </div>
+            <span class="nc-label">Customers</span>
+        </a>
+    </div>
+    <div class="col-6 col-sm-4 col-md-2">
+        <a href="/billing/customers/add/" class="nav-card">
+            <div class="nc-icon" style="background:rgba(239,68,68,.12);color:#fca5a5;">
+                <i class="bi bi-person-plus-fill"></i>
+            </div>
+            <span class="nc-label">Add Customer</span>
+        </a>
+    </div>
 </div>
 
-
-<!-- 🔥 CHART ROW 1 -->
-<div class="row mb-4 g-3">
-
-    <!-- Monthly Revenue -->
-    <div class="col-md-6">
-        <div class="card shadow p-3">
-            <h5>📈 Monthly Revenue</h5>
-            <canvas id="revenueChart"></canvas>
+<!-- Stat Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="stat-card" style="border-left:3px solid var(--green);">
+            <div class="stat-icon-box" style="background:rgba(16,185,129,.12);color:var(--green);">
+                <i class="bi bi-cash-stack"></i>
+            </div>
+            <div class="stat-label">Total Revenue</div>
+            <div class="stat-value" style="color:var(--green);">₹{{ total_revenue }}</div>
         </div>
     </div>
-
-    <!-- Top Products -->
-    <div class="col-md-6">
-        <div class="card shadow p-3">
-            <h5>🔥 Top Selling Products</h5>
-            <canvas id="productChart"></canvas>
+    <div class="col-6 col-md-3">
+        <div class="stat-card" style="border-left:3px solid var(--accent);">
+            <div class="stat-icon-box" style="background:rgba(139,92,246,.12);color:var(--accent-2);">
+                <i class="bi bi-receipt-cutoff"></i>
+            </div>
+            <div class="stat-label">Total Invoices</div>
+            <div class="stat-value" style="color:var(--accent-2);">{{ total_invoices }}</div>
         </div>
     </div>
-
+    <div class="col-6 col-md-3">
+        <div class="stat-card" style="border-left:3px solid var(--amber);">
+            <div class="stat-icon-box" style="background:rgba(245,158,11,.12);color:var(--amber);">
+                <i class="bi bi-box-seam"></i>
+            </div>
+            <div class="stat-label">Products</div>
+            <div class="stat-value" style="color:var(--amber);">{{ total_products }}</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card" style="border-left:3px solid var(--red);">
+            <div class="stat-icon-box" style="background:rgba(239,68,68,.12);color:var(--red);">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+            </div>
+            <div class="stat-label">Low Stock</div>
+            <div class="stat-value" style="color:var(--red);">{{ low_stock_products|length }}</div>
+        </div>
+    </div>
 </div>
 
-
-<!-- 🔥 CHART ROW 2 -->
-<div class="row mb-4 g-3">
-
-    <!-- Payment Methods -->
-    <div class="col-md-6">
-        <div class="card shadow p-3">
-            <h5>💳 Payment Methods</h5>
-            <canvas id="paymentChart"></canvas>
+<!-- Charts Row 1 -->
+<div class="row g-3 mb-4">
+    <div class="col-12 col-md-7">
+        <div class="bp-card h-100">
+            <div class="d-flex align-items-center gap-2 mb-3">
+                <div style="width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);"></div>
+                <span class="section-title">Monthly Revenue</span>
+            </div>
+            <canvas id="revenueChart" height="130"></canvas>
         </div>
     </div>
-
+    <div class="col-12 col-md-5">
+        <div class="bp-card h-100">
+            <div class="d-flex align-items-center gap-2 mb-3">
+                <div style="width:8px;height:8px;border-radius:50%;background:var(--amber);box-shadow:0 0 8px rgba(245,158,11,.5);"></div>
+                <span class="section-title">Top Selling Products</span>
+            </div>
+            <canvas id="productChart" height="130"></canvas>
+        </div>
+    </div>
 </div>
 
-
-<!-- 🔥 TABLES -->
+<!-- Charts Row 2 + Tables -->
 <div class="row g-3">
+    <div class="col-12 col-md-4">
+        <div class="bp-card">
+            <div class="d-flex align-items-center gap-2 mb-3">
+                <div style="width:8px;height:8px;border-radius:50%;background:var(--pink);box-shadow:0 0 8px rgba(236,72,153,.5);"></div>
+                <span class="section-title">Payment Methods</span>
+            </div>
+            <canvas id="paymentChart" height="190"></canvas>
+        </div>
+    </div>
 
-    <div class="col-md-6">
-        <div class="card shadow p-3">
-            <h5>⚠️ Low Stock</h5>
-            <table class="table table-sm table-hover">
-                {% for p in low_stock_products %}
-                <tr>
-                    <td>{{ p.name }}</td>
-                    <td class="text-danger fw-bold">{{ p.stock }}</td>
-                </tr>
-                {% empty %}
-                <tr><td>No issues</td></tr>
-                {% endfor %}
+    <div class="col-12 col-md-4">
+        <div class="bp-card">
+            <div class="d-flex align-items-center gap-2 mb-3">
+                <div style="width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 8px rgba(239,68,68,.5);"></div>
+                <span class="section-title">⚠ Low Stock Alerts</span>
+            </div>
+            <table class="bp-table">
+                <thead>
+                    <tr><th>Product</th><th>Stock</th></tr>
+                </thead>
+                <tbody>
+                    {% for p in low_stock_products %}
+                    <tr>
+                        <td>{{ p.name }}</td>
+                        <td><span class="bp-badge bp-badge-red">{{ p.stock }} left</span></td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="2" style="text-align:center;padding:1.5rem;color:var(--text-muted);">
+                            <i class="bi bi-check-circle" style="color:var(--green);margin-right:.4rem;"></i>All stocked up
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
             </table>
         </div>
     </div>
 
-    <div class="col-md-6">
-        <div class="card shadow p-3">
-            <h5>🕒 Recent Invoices</h5>
-            <table class="table table-sm table-striped">
-                {% for inv in recent_invoices %}
-                <tr>
-                    <td>#{{ inv.id }}</td>
-                    <td>{{ inv.customer.name }}</td>
-                    <td class="fw-bold">₹{{ inv.get_total }}</td>
-                </tr>
-                {% empty %}
-                <tr><td>No invoices</td></tr>
-                {% endfor %}
+    <div class="col-12 col-md-4">
+        <div class="bp-card">
+            <div class="d-flex align-items-center gap-2 mb-3">
+                <div style="width:8px;height:8px;border-radius:50%;background:var(--accent-2);box-shadow:0 0 8px var(--accent-glow);"></div>
+                <span class="section-title">Recent Invoices</span>
+            </div>
+            <table class="bp-table">
+                <thead>
+                    <tr><th>#</th><th>Customer</th><th style="text-align:right;">Total</th></tr>
+                </thead>
+                <tbody>
+                    {% for inv in recent_invoices %}
+                    <tr>
+                        <td><span class="bp-badge bp-badge-purple">#{{ inv.id }}</span></td>
+                        <td>{{ inv.customer.name }}</td>
+                        <td style="text-align:right;color:var(--green);font-weight:600;">₹{{ inv.get_total }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" style="text-align:center;padding:1.5rem;color:var(--text-muted);">No invoices yet</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
             </table>
         </div>
     </div>
-
 </div>
-
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script>
+Chart.defaults.color          = '#7c6fa0';
+Chart.defaults.borderColor    = '#2a2448';
+Chart.defaults.font.family    = "'DM Sans', sans-serif";
+Chart.defaults.font.size      = 12;
+
 new Chart(document.getElementById('revenueChart'), {
     type: 'bar',
     data: {
         labels: {{ months|safe }},
         datasets: [{
-            label: 'Revenue',
+            label: 'Revenue (₹)',
             data: {{ totals|safe }},
-            borderWidth: 1
+            backgroundColor: 'rgba(139,92,246,.65)',
+            borderColor: '#8b5cf6',
+            borderWidth: 2,
+            borderRadius: 7,
+            borderSkipped: false,
+            hoverBackgroundColor: 'rgba(167,139,250,.85)',
         }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { grid: { color: '#1d1a30' } },
+            y: { grid: { color: '#1d1a30' } }
+        },
+        animation: { duration: 900, easing: 'easeOutQuart' }
     }
 });
 
@@ -156,20 +237,39 @@ new Chart(document.getElementById('productChart'), {
     data: {
         labels: {{ top_product_names|safe }},
         datasets: [{
-            label: 'Sales',
+            label: 'Units',
             data: {{ top_product_sales|safe }},
-            borderWidth: 1
+            backgroundColor: ['#f59e0b','#d97706','#b45309','#92400e','#78350f'],
+            borderRadius: 7,
         }]
+    },
+    options: {
+        indexAxis: 'y', responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { grid: { color: '#1d1a30' } },
+            y: { grid: { display: false } }
+        },
+        animation: { duration: 900, delay: ctx => ctx.dataIndex * 80 }
     }
 });
 
 new Chart(document.getElementById('paymentChart'), {
-    type: 'pie',
+    type: 'doughnut',
     data: {
         labels: {{ payment_labels|safe }},
         datasets: [{
-            data: {{ payment_totals|safe }}
+            data: {{ payment_totals|safe }},
+            backgroundColor: ['#8b5cf6','#a78bfa','#ec4899','#10b981','#f59e0b'],
+            borderColor: '#100e1d',
+            borderWidth: 3,
+            hoverOffset: 8,
         }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { position: 'bottom', labels: { padding: 16, boxWidth: 12 } } },
+        animation: { animateRotate: true, duration: 1000 }
     }
 });
 </script>

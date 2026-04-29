@@ -1,21 +1,77 @@
-<h2>Sales Report</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sales Report — BillingPro</title>
+    <style>
+        * { box-sizing:border-box; margin:0; padding:0; }
+        body { font-family:'Helvetica Neue',Arial,sans-serif; font-size:13px; color:#1a1a2e; padding:40px; background:#fff; }
+        .header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:32px; }
+        .brand-name { font-size:22px; font-weight:800; color:#8b5cf6; letter-spacing:-1px; }
+        .brand-tag  { font-size:11px; color:#7c6fa0; margin-top:2px; }
+        .report-title { font-size:24px; font-weight:700; text-align:right; }
+        .report-meta  { font-size:11px; color:#7c6fa0; text-align:right; margin-top:4px; }
+        .divider { border:none; border-top:2px solid #8b5cf6; margin:0 0 24px; opacity:.35; }
+        .period { background:#f4f1ff; border-radius:8px; padding:12px 18px; display:inline-block; font-size:12px; color:#7c6fa0; margin-bottom:24px; }
+        .period strong { color:#8b5cf6; }
+        table { width:100%; border-collapse:collapse; margin-bottom:28px; }
+        thead tr { background:#f4f1ff; }
+        thead th { padding:10px 12px; text-align:left; font-size:10px; text-transform:uppercase; letter-spacing:1px; color:#7c6fa0; font-weight:700; }
+        thead th:last-child { text-align:right; }
+        tbody td { padding:9px 12px; border-bottom:1px solid #f0eeff; font-size:12.5px; }
+        tbody td:last-child { text-align:right; font-weight:600; color:#059669; }
+        .total-wrap { display:flex; justify-content:flex-end; }
+        .total-box { background:linear-gradient(135deg,#f4f1ff,#ede9fe); border-radius:10px; padding:16px 28px; }
+        .total-label { font-size:11px; text-transform:uppercase; letter-spacing:1px; color:#7c6fa0; margin-bottom:4px; }
+        .total-val   { font-size:22px; font-weight:800; color:#8b5cf6; }
+        .footer { margin-top:40px; text-align:center; font-size:10.5px; color:#a0a0c0; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <div class="brand-name">💼 BillingPro</div>
+            <div class="brand-tag">Professional Billing System</div>
+        </div>
+        <div>
+            <div class="report-title">Sales Report</div>
+            <div class="report-meta">Generated report</div>
+        </div>
+    </div>
 
-<p>From: {{ start }} To: {{ end }}</p>
+    <hr class="divider">
 
-<table border="1" cellpadding="5">
-    <tr>
-        <th>ID</th>
-        <th>Customer</th>
-        <th>Total</th>
-    </tr>
+    <div class="period">
+        Period: <strong>{{ start }}</strong>
+        {% if end %} → <strong>{{ end }}</strong>{% endif %}
+    </div>
 
-    {% for inv in invoices %}
-    <tr>
-        <td>{{ inv.id }}</td>
-Customer: {{ invoice.customer.name }}
-        <td>&#8377; {{ inv.get_total }}</td>
-    </tr>
-    {% endfor %}
-</table>
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Customer</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for inv in invoices %}
+            <tr>
+                <td>#{{ inv.id }}</td>
+                <td>{{ inv.customer.name }}</td>
+                <td>₹{{ inv.get_total }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
-<h3>Total Revenue: &#8377; {{ total }}</h3>
+    <div class="total-wrap">
+        <div class="total-box">
+            <div class="total-label">Total Revenue</div>
+            <div class="total-val">₹{{ total }}</div>
+        </div>
+    </div>
+
+    <div class="footer">BillingPro · Sales Report</div>
+</body>
+</html>

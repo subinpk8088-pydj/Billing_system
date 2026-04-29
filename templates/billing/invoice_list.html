@@ -2,28 +2,53 @@
 
 {% block content %}
 
-<h2>Invoices</h2>
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+    <div>
+        <p class="page-sup">Billing</p>
+        <h1 class="page-title">Invoices</h1>
+    </div>
+    <a href="{% url 'create_invoice' %}" class="bp-btn bp-btn-primary">
+        <i class="bi bi-plus-circle-fill"></i> New Invoice
+    </a>
+</div>
 
-<table class="table table-bordered">
-    <tr>
-        <th>ID</th>
-        <th>Customer</th>
-        <th>Date</th>
-        <th>Total</th>
-        <th>Action</th>
-    </tr>
-
-    {% for invoice in invoices %}
-    <tr>
-        <td>{{ invoice.id }}</td>
-<td>{{ invoice.customer.name }}</td>
-        <td>{{ invoice.created_at }}</td>
-        <td>{{ invoice.get_total }}</td>
-        <td>
-            <a href="/billing/invoice/{{ invoice.id }}/" class="btn btn-primary btn-sm">View</a>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+<div class="bp-card" style="padding:0;overflow:hidden;">
+    <div style="overflow-x:auto;">
+        <table class="bp-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Customer</th>
+                    <th>Date</th>
+                    <th>Total</th>
+                    <th style="text-align:right;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for invoice in invoices %}
+                <tr>
+                    <td><span class="bp-badge bp-badge-purple">#{{ invoice.id }}</span></td>
+                    <td style="font-weight:500;color:var(--text);">{{ invoice.customer.name }}</td>
+                    <td style="color:var(--text-muted);font-size:.82rem;">{{ invoice.created_at|date:"d M Y, H:i" }}</td>
+                    <td style="color:var(--green);font-weight:700;">₹{{ invoice.get_total }}</td>
+                    <td style="text-align:right;">
+                        <a href="/billing/invoice/{{ invoice.id }}/" class="bp-btn bp-btn-ghost" style="font-size:.78rem;padding:.3rem .85rem;">
+                            <i class="bi bi-eye-fill"></i> View
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align:center;padding:3.5rem;color:var(--text-muted);">
+                        <i class="bi bi-receipt" style="font-size:2.5rem;display:block;margin-bottom:.85rem;color:var(--text-dim);"></i>
+                        No invoices yet —
+                        <a href="{% url 'create_invoice' %}" style="color:var(--accent-2);text-decoration:none;">create your first</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 
 {% endblock %}

@@ -1,16 +1,24 @@
 from pathlib import Path
 import os
+import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# SECURITY
+# =========================
+# 🔐 SECURITY
+# =========================
 SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key')
-DEBUG = True
-ALLOWED_HOSTS = []
+
+# ❗ MUST be False in production
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
+
+ALLOWED_HOSTS = ['*']  # tighten later with your domain
 
 
-# APPLICATIONS
+# =========================
+# 📦 APPLICATIONS
+# =========================
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -26,9 +34,15 @@ INSTALLED_APPS = [
 ]
 
 
-# MIDDLEWARE
+# =========================
+# ⚙️ MIDDLEWARE
+# =========================
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+
+    # 🔥 REQUIRED FOR STATIC FILES IN PRODUCTION
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -41,7 +55,9 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'core.urls'
 
 
-# TEMPLATES
+# =========================
+# 🎨 TEMPLATES
+# =========================
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -61,16 +77,20 @@ TEMPLATES = [
 WSGI_APPLICATION = 'core.wsgi.application'
 
 
-# DATABASE
+# =========================
+# 🗄️ DATABASE (AUTO SWITCH)
+# =========================
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default='sqlite:///db.sqlite3',
+        conn_max_age=600
+    )
 }
 
 
-# PASSWORD VALIDATION
+# =========================
+# 🔑 PASSWORD VALIDATION
+# =========================
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -79,41 +99,60 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# INTERNATIONAL
+# =========================
+# 🌍 INTERNATIONAL
+# =========================
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Asia/Kolkata'
 USE_I18N = True
 USE_TZ = True
 
 
-# STATIC FILES
+# =========================
+# 📁 STATIC FILES
+# =========================
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 
-STATIC_ROOT = BASE_DIR / "staticfiles"  # ✅ required for deployment
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# 🔥 IMPORTANT FOR WHITENOISE
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
-# MEDIA FILES
+# =========================
+# 📂 MEDIA FILES
+# =========================
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 
-# DEFAULT PRIMARY KEY
+# =========================
+# 🔢 DEFAULT PK
+# =========================
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# CUSTOM USER MODEL
+# =========================
+# 👤 CUSTOM USER
+# =========================
 AUTH_USER_MODEL = 'accounts.User'
 
 
-# AUTH SETTINGS
+# =========================
+# 🔐 AUTH REDIRECTS
+# =========================
 LOGIN_URL = '/accounts/login/'
-LOGIN_REDIRECT_URL = '/billing/invoices/'
+LOGIN_REDIRECT_URL = '/billing/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 
 
-# CSRF (future deployment fix)
-CSRF_TRUSTED_ORIGINS = []
+# =========================
+# 🔐 CSRF (IMPORTANT FOR RENDER)
+# =========================
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.onrender.com',
+]
